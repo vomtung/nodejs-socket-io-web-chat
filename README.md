@@ -3,11 +3,48 @@
 dependencies
 run with cmd
 ```bash
+rm -rf node_modules package-lock.json
+npm install
+rm -rf node_modules package-lock.json
+npm install
+rm -rf node_modules package-lock.json
+npm install
+rm -rf node_modules package-lock.json
+npm install
+
 npm install
 npm install
 npm install
 npm install
+
+npm list express socket.io
+npm list express socket.io
+npm list express socket.io
+npm list express socket.io
+
+express@4.18.2
+socket.io@2.4.1
+
 ```
+
+```bash
+http://localhost:3000/socket.io/?EIO=3&transport=polling
+ws://localhost:3000/socket.io/?EIO=3&transport=websocket
+```
+
+```bash
+npx wscat -c "ws://localhost:3000/socket.io/?EIO=3&transport=websocket"
+npx wscat -c "ws://localhost:3000/socket.io/?EIO=3&transport=websocket"
+npx wscat -c "ws://localhost:3000/socket.io/?EIO=3&transport=websocket"
+npx wscat -c "ws://localhost:3000/socket.io/?EIO=3&transport=websocket"
+
+
+
+
+
+```
+
+
 
 ```bash
 npm uninstall socket.io
