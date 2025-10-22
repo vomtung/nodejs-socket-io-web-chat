@@ -6,6 +6,7 @@ function initSocket(server) {
       origin: "*",
       methods: ["GET", "POST"]
     },
+    allowEIO3: true,
     transports: ["websocket", "polling"]
   });
 
