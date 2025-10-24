@@ -38,8 +38,10 @@ npx wscat -c "ws://localhost:3000/socket.io/?EIO=3&transport=websocket"
 npx wscat -c "ws://localhost:3000/socket.io/?EIO=3&transport=websocket"
 npx wscat -c "ws://localhost:3000/socket.io/?EIO=3&transport=websocket"
 
-
-
+Connected (press CTRL+C to quit)
+< 0{"sid":"ui3AAiX38IXR7UiLAAAB","upgrades":[],"pingInterval":25000,"pingTimeout":20000}
+< 40
+Disconnected (code: 1005, reason: "")
 
 
 ```
