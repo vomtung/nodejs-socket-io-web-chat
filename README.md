@@ -63,6 +63,15 @@ npm list socket.io
 npm list socket.io
 npm list socket.io
 npm list socket.io
+
+
+
+npm list express socket.io
+halo-socket-chat@1.0.0 E:\master\github\nodejs-socket-io-web-chat
++-- express@4.21.2
+`-- socket.io@2.4.1
+
+
 ```
 
 run server
