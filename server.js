@@ -1,33 +1,55 @@
 const express = require("express");
 const http = require("http");
-const WebSocket = require("ws");
 
-const app = express();
-const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+const WebSocket = require('ws');
+const wss = new WebSocket.Server({ port: 3000 });
 
-// Khi có client kết nối
-wss.on("connection", (ws, req) => {
-  console.log("✅ Client connected:", req.socket.remoteAddress);
+// Lưu danh sách client cùng với userId
+const clients = new Map(); // Map<ws, userId>
 
-  // Gửi chào mừng
-  ws.send("👋 Welcome to WebSocket server!");
+wss.on('connection', (ws) => {
+  console.log('✅ New client connected');
 
-  // Nhận message từ client
-  ws.on("message", (message) => {
-    console.log("📩 Received:", message.toString());
+  // Khi client gửi userId sau khi connect
+  ws.on('message', (message) => {
 
-    // Phản hồi lại client
-    ws.send(`Server received: ${message}`);
+    console.log('✅ server receive message' + message.toString());
+
+    try {
+      const data = JSON.parse(message.toString());
+
+      // 1️⃣ Nếu là message đăng ký userId
+          if (data.type === 'create_room') {
+              data.users.forEach(u => {
+              clients.set(u.userId, ws); // key = userId, value = socket
+              console.log(`📲 Registered userId=${u.userId} (${u.userFullName})`);
+          });
+        console.log(`📲 Registered client with userId=${data.userId}`);
+        return;
+      }
+
+      // 2️⃣ Nếu là message gửi dữ liệu bình thường
+      if (data.type === 'SEND_MESSAGE') {
+        const { iuserIds, content } = data;
+        console.log(`📩 Message to users [${iuserIds.join(', ')}]: ${content}`);
+
+        // Gửi cho các client có userId trong danh sách
+        clients.forEach((uid, client) => {
+          if (iuserIds.includes(uid) && client.readyState === WebSocket.OPEN) {
+            client.send(`📨 From ${clients.get(ws)}: ${content}`);
+          }
+        });
+      }
+
+    } catch (err) {
+      console.error('❌ Invalid message:', err);
+    }
   });
 
-  // Khi client ngắt kết nối
-  ws.on("close", () => {
-    console.log("❌ Client disconnected");
+  ws.on('close', () => {
+    console.log('❌ Client disconnected');
+    clients.delete(ws);
   });
 });
 
-const PORT = 3000;
-server.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 WebSocket server running at ws://localhost:${PORT}`);
-});
+
