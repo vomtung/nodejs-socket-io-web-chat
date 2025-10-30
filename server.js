@@ -19,24 +19,29 @@ wss.on('connection', (ws) => {
       const data = JSON.parse(message.toString());
 
       // 1️⃣ Nếu là message đăng ký userId
-          if (data.type === 'create_room') {
+        if (data.messageType === 'create_room') {
               data.users.forEach(u => {
               clients.set(u.userId, ws); // key = userId, value = socket
               console.log(`📲 Registered userId=${u.userId} (${u.userFullName})`);
-          });
+      });
         console.log(`📲 Registered client with userId=${data.userId}`);
         return;
       }
 
       // 2️⃣ Nếu là message gửi dữ liệu bình thường
-      if (data.type === 'SEND_MESSAGE') {
-        const { iuserIds, content } = data;
-        console.log(`📩 Message to users [${iuserIds.join(', ')}]: ${content}`);
+      if (data.messageType === 'SEND_MESSAGE') {
+        const { userIds, content } = data;
+        console.log(`📩 Message to users [${userIds.join(', ')}]: ${data}`);
 
         // Gửi cho các client có userId trong danh sách
-        clients.forEach((uid, client) => {
-          if (iuserIds.includes(uid) && client.readyState === WebSocket.OPEN) {
-            client.send(`📨 From ${clients.get(ws)}: ${content}`);
+        clients.forEach((client, uid) => {
+          console.log(`check condition userIds : ${userIds}`);
+          console.log(`check condition uid : ${uid}`);
+          console.log('DEBUG userIds:', userIds, 'typeof:', typeof userIds);
+
+          if (userIds.map(Number).includes(Number(uid)) && client.readyState === WebSocket.OPEN) {
+
+            client.send(`📨 From ${clients.get(ws)}: ${data}`);
           }
         });
       }
