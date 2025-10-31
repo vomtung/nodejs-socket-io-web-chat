@@ -35,14 +35,17 @@ wss.on('connection', (ws) => {
 
         // Gửi cho các client có userId trong danh sách
         clients.forEach((client, uid) => {
-          console.log(`check condition userIds : ${userIds}`);
-          console.log(`check condition uid : ${uid}`);
-          console.log('DEBUG userIds:', userIds, 'typeof:', typeof userIds);
+            console.log(`check condition uid : ${uid}`);
+            if (userIds.includes(uid) && client.readyState === WebSocket.OPEN) {
+              const messagePayload = {
+              fromUserId: uid,
+              content: content,
+              timestamp: Date.now(),
+            };
 
-          if (userIds.map(Number).includes(Number(uid)) && client.readyState === WebSocket.OPEN) {
-
-            client.send(`📨 From ${clients.get(ws)}: ${data}`);
-          }
+            client.send(JSON.stringify(messagePayload));
+            console.log(`✅ Sent message to userId=${uid}`);
+            }
         });
       }
 
