@@ -30,7 +30,7 @@ wss.on('connection', (ws) => {
 
       // 2️⃣ Nếu là message gửi dữ liệu bình thường
       if (data.messageType === 'SEND_MESSAGE') {
-        const { userIds, content } = data;
+        const { userIds, message, messageFromUserId } = data;
         console.log(`📩 Message to users [${userIds.join(', ')}]: ${data}`);
 
         // Gửi cho các client có userId trong danh sách
@@ -39,7 +39,8 @@ wss.on('connection', (ws) => {
             if (userIds.includes(uid) && client.readyState === WebSocket.OPEN) {
               const messagePayload = {
               fromUserId: uid,
-              content: content,
+              content: message,
+              messageFromUserId: messageFromUserId,
               timestamp: Date.now(),
             };
 
