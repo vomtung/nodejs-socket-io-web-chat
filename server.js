@@ -18,15 +18,28 @@ wss.on('connection', (ws) => {
     try {
       const data = JSON.parse(message.toString());
 
+       if (data.messageType === 'register_user') {
+          const userId = data.userId;
+
+          if (!userId) {
+            console.warn('⚠️ Missing userId in register_user message');
+            return;
+          }
+
+          clients.set(userId, ws); // Lưu userId làm key, ws làm value
+          console.log(`📲 Registered userId=${userId}`);
+          return;
+        }
+
       // 1️⃣ Nếu là message đăng ký userId
         if (data.messageType === 'create_room') {
-              data.users.forEach(u => {
-              clients.set(u.userId, ws); // key = userId, value = socket
-              console.log(`📲 Registered userId=${u.userId} (${u.userFullName})`);
-      });
-        console.log(`📲 Registered client with userId=${data.userId}`);
-        return;
-      }
+              //data.users.forEach(u => {
+              //clients.set(u.userId, ws); // key = userId, value = socket
+              //console.log(`📲 Registered userId=${u.userId} (${u.userFullName})`);
+          //});
+          //console.log(`📲 Registered client with userId=${data.userId}`);
+          //return;
+        }
 
       // 2️⃣ Nếu là message gửi dữ liệu bình thường
       if (data.messageType === 'SEND_MESSAGE') {
