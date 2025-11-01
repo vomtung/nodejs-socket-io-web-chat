@@ -43,7 +43,7 @@ wss.on('connection', (ws) => {
 
       // 2️⃣ Nếu là message gửi dữ liệu bình thường
       if (data.messageType === 'SEND_MESSAGE') {
-        const { userIds, message, messageFromUserId } = data;
+        const { userIds, message, messageFromUserId, roomCode } = data;
         console.log(`📩 Message to users [${userIds.join(', ')}]: ${data}`);
 
         // Gửi cho các client có userId trong danh sách
@@ -53,6 +53,7 @@ wss.on('connection', (ws) => {
               const messagePayload = {
               fromUserId: uid,
               content: message,
+              roomCode:roomCode,
               messageFromUserId: messageFromUserId,
               timestamp: Date.now(),
             };
