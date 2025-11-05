@@ -51,10 +51,10 @@ wss.on('connection', (ws) => {
             console.log(`check condition uid : ${uid}`);
             if (userIds.includes(uid) && client.readyState === WebSocket.OPEN) {
               const messagePayload = {
-              fromUserId: uid,
+              toUserId: uid,
               content: message,
               roomCode:roomCode,
-              messageFromUserId: messageFromUserId,
+              fromUserId: messageFromUserId,
               timestamp: Date.now(),
             };
 
