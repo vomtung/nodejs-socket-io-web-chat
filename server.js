@@ -54,6 +54,7 @@ wss.on('connection', (ws) => {
               toUserId: uid,
               content: message,
               roomCode:roomCode,
+              memberIds:userIds,
               fromUserId: messageFromUserId,
               timestamp: Date.now(),
             };
