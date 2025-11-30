@@ -17,61 +17,43 @@ npm install
 npm install
 npm install
 
-npm list express socket.io
-npm list express socket.io
-npm list express socket.io
-npm list express socket.io
 
-express@4.18.2
-socket.io@2.4.1
+```
+
+this app using
+WebSocket
+WebSocket
+WebSocket
+WebSocket
+
+https://github.com/websockets/ws <br/>
+https://github.com/websockets/ws <br/>
+https://github.com/websockets/ws <br/>
+https://github.com/websockets/ws <br/>
+
+```bash
+npm install ws
+npm install ws
+npm install ws
+npm install ws
+```
+
+
+# SQLLite
+```bash
+npm install sqlite3
+npm install sqlite3
+npm install sqlite3
+npm install sqlite3
 
 ```
 
 ```bash
-http://localhost:3000/socket.io/?EIO=3&transport=polling
-ws://localhost:3000/socket.io/?EIO=3&transport=websocket
-```
 
-```bash
-npx wscat -c "ws://localhost:3000/socket.io/?EIO=3&transport=websocket"
-npx wscat -c "ws://localhost:3000/socket.io/?EIO=3&transport=websocket"
-npx wscat -c "ws://localhost:3000/socket.io/?EIO=3&transport=websocket"
-npx wscat -c "ws://localhost:3000/socket.io/?EIO=3&transport=websocket"
-
-Connected (press CTRL+C to quit)
-< 0{"sid":"ui3AAiX38IXR7UiLAAAB","upgrades":[],"pingInterval":25000,"pingTimeout":20000}
-< 40
-Disconnected (code: 1005, reason: "")
-
-
-```
-
-
-
-```bash
-npm uninstall socket.io
-npm uninstall socket.io
-npm uninstall socket.io
-npm uninstall socket.io
-
-npm install socket.io@2.4.1
-npm install socket.io@2.4.1
-npm install socket.io@2.4.1
-npm install socket.io@2.4.1
-
-npm list socket.io
-npm list socket.io
-npm list socket.io
-npm list socket.io
-
-
-
-npm list express socket.io
-halo-socket-chat@1.0.0 E:\master\github\nodejs-socket-io-web-chat
-+-- express@4.21.2
-`-- socket.io@2.4.1
-
-
+npm install multer
+npm install multer
+npm install multer
+npm install multer
 ```
 
 run server
