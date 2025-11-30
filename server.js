@@ -1,68 +1,77 @@
 const express = require("express");
 const http = require("http");
+const WebSocket = require("ws");
 
-const WebSocket = require('ws');
-const wss = new WebSocket.Server({ port: 3000 });
+
+const app = require("./src/app"); // import Express app
+const server = http.createServer(app); // tạo server HTTP
+
+// WebSocket server dùng chung HTTP server
+const wss = new WebSocket.Server({ server });
 
 // Lưu danh sách client cùng với userId
-const clients = new Map(); // Map<ws, userId>
+const clients = new Map(); // Map<userId, ws>
 
 wss.on('connection', (ws) => {
   console.log('✅ New client connected');
 
-  // Khi client gửi userId sau khi connect
   ws.on('message', (message) => {
-
-    console.log('✅ server receive message' + message.toString());
+    console.log('✅ server receive message', message.toString());
 
     try {
       const data = JSON.parse(message.toString());
 
-       if (data.messageType === 'register_user') {
-          const userId = data.userId;
+      if (data.messageType === 'register_user') {
+        const userId = data.userId;
+        if (!userId) return console.warn('⚠️ Missing userId');
+        clients.set(userId, ws);
+        console.log(`📲 Registered userId=${userId}`);
+        return;
+      }
 
-          if (!userId) {
-            console.warn('⚠️ Missing userId in register_user message');
-            return;
-          }
+      if (data.messageType === 'TEXT_MESSAGE') {
+        const { userIds, message: msgContent, messageFromUserId, roomCode } = data;
+        console.log(`📩 Message to users [${userIds.join(', ')}]:`, data);
 
-          clients.set(userId, ws); // Lưu userId làm key, ws làm value
-          console.log(`📲 Registered userId=${userId}`);
-          return;
-        }
-
-      // 1️⃣ Nếu là message đăng ký userId
-        if (data.messageType === 'create_room') {
-              //data.users.forEach(u => {
-              //clients.set(u.userId, ws); // key = userId, value = socket
-              //console.log(`📲 Registered userId=${u.userId} (${u.userFullName})`);
-          //});
-          //console.log(`📲 Registered client with userId=${data.userId}`);
-          //return;
-        }
-
-      // 2️⃣ Nếu là message gửi dữ liệu bình thường
-      if (data.messageType === 'SEND_MESSAGE') {
-        const { userIds, message, messageFromUserId, roomCode } = data;
-        console.log(`📩 Message to users [${userIds.join(', ')}]: ${data}`);
-
-        // Gửi cho các client có userId trong danh sách
-        clients.forEach((client, uid) => {
-            console.log(`check condition uid : ${uid}`);
-            if (userIds.includes(uid) && client.readyState === WebSocket.OPEN) {
-              const messagePayload = {
+        for (let [uid, client] of clients.entries()) {
+          if (userIds.includes(uid) && client.readyState === WebSocket.OPEN) {
+            const payload = {
               toUserId: uid,
-              content: message,
-              roomCode:roomCode,
-              memberIds:userIds,
+              content: msgContent,
+              roomCode,
+              memberIds: userIds,
+              messageType: data.messageType === 'TEXT_MESSAGE' ? 'TEXT_MESSAGE' : undefined,
               fromUserId: messageFromUserId,
               timestamp: Date.now(),
             };
-
-            client.send(JSON.stringify(messagePayload));
+            client.send(JSON.stringify(payload));
             console.log(`✅ Sent message to userId=${uid}`);
-            }
-        });
+          }
+        }
+      } else if (data.messageType === 'FILE_MESSAGE_IMAGE') {
+
+        const { userIds, message: msgContent, messageFromUserId, roomCode } = data;
+        console.log(`📩 Message to users [${userIds.join(', ')}]:`, data);
+
+        for (let [uid, client] of clients.entries()) {
+          if (userIds.includes(uid) && client.readyState === WebSocket.OPEN) {
+            const payload = {
+              toUserId: uid,
+              content: msgContent,
+              roomCode: roomCode,
+              fileIdentifier: data.fileIdentifier,
+              fileType: data.fileType,
+              memberIds: userIds,
+              messageType: data.messageType === 'FILE_MESSAGE_IMAGE' ? 'FILE_MESSAGE_IMAGE' : undefined,
+              fromUserId: messageFromUserId,
+              timestamp: Date.now(),
+            };
+            console.log("📩 Sent to user:", payload);
+            client.send(JSON.stringify(payload));
+            console.log(`✅ Sent message to userId=${uid}`);
+          }
+        }
+
       }
 
     } catch (err) {
@@ -72,8 +81,15 @@ wss.on('connection', (ws) => {
 
   ws.on('close', () => {
     console.log('❌ Client disconnected');
-    clients.delete(ws);
+    // xóa userId tương ứng với ws
+    for (let [uid, client] of clients.entries()) {
+      if (client === ws) clients.delete(uid);
+    }
   });
 });
 
-
+// chạy server HTTP + WS trên cùng port 4000
+const PORT = 3000;
+server.listen(PORT, () => {
+  console.log(`📡 HTTP+WebSocket server running on port ${PORT}`);
+});
