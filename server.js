@@ -37,8 +37,8 @@ wss.on('connection', (ws) => {
           if (userIds.includes(uid) && client.readyState === WebSocket.OPEN) {
             const payload = {
               toUserId: uid,
-              content: msgContent,
-              roomCode,
+              message: msgContent,
+              roomCode: roomCode,
               memberIds: userIds,
               messageType: data.messageType === 'TEXT_MESSAGE' ? 'TEXT_MESSAGE' : undefined,
               fromUserId: messageFromUserId,
@@ -48,7 +48,30 @@ wss.on('connection', (ws) => {
             console.log(`✅ Sent message to userId=${uid}`);
           }
         }
-      } else if (data.messageType === 'FILE_MESSAGE_IMAGE') {
+      } else if (data.messageType === 'REPLY_MESSAGE') {
+        const { userIds, message: msgContent, messageFromUserId, roomCode } = data;
+        console.log(`📩 Message to users [${userIds.join(', ')}]:`);
+
+        for (let [uid, client] of clients.entries()) {
+          if (userIds.includes(uid) && client.readyState === WebSocket.OPEN) {
+            const payload = {
+              targetReplyMessage: data.targetReplyMessage,
+              toUserId: uid,
+              message: msgContent,
+              roomCode: roomCode,
+              memberIds: userIds,
+              messageType: data.messageType === 'REPLY_MESSAGE' ? 'REPLY_MESSAGE' : undefined,
+              fromUserId: messageFromUserId,
+              timestamp: Date.now(),
+            };
+            console.log(`📩 Message to users :`, payload);
+            client.send(JSON.stringify(payload));
+            console.log(`✅ Sent message to userId=${uid}`);
+          }
+        }
+      }
+      
+      else if (data.messageType === 'FILE_MESSAGE_IMAGE') {
 
         const { userIds, message: msgContent, messageFromUserId, roomCode } = data;
         console.log(`📩 Message to users [${userIds.join(', ')}]:`, data);
@@ -63,6 +86,32 @@ wss.on('connection', (ws) => {
               fileType: data.fileType,
               memberIds: userIds,
               messageType: data.messageType === 'FILE_MESSAGE_IMAGE' ? 'FILE_MESSAGE_IMAGE' : undefined,
+              fromUserId: messageFromUserId,
+              timestamp: Date.now(),
+            };
+            console.log("📩 Sent to user:", payload);
+            client.send(JSON.stringify(payload));
+            console.log(`✅ Sent message to userId=${uid}`);
+          }
+        }
+
+      } 
+      
+      else if (data.messageType === 'FILE_MESSAGE_MP4') {
+
+        const { userIds, message: msgContent, messageFromUserId, roomCode } = data;
+        console.log(`📩 Message to users [${userIds.join(', ')}]:`, data);
+
+        for (let [uid, client] of clients.entries()) {
+          if (userIds.includes(uid) && client.readyState === WebSocket.OPEN) {
+            const payload = {
+              toUserId: uid,
+              content: msgContent,
+              roomCode: roomCode,
+              fileIdentifier: data.fileIdentifier,
+              fileType: data.fileType,
+              memberIds: userIds,
+              messageType: data.messageType === 'FILE_MESSAGE_MP4' ? 'FILE_MESSAGE_MP4' : undefined,
               fromUserId: messageFromUserId,
               timestamp: Date.now(),
             };
