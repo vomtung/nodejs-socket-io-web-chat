@@ -56,6 +56,7 @@ wss.on('connection', (ws) => {
           if (userIds.includes(uid) && client.readyState === WebSocket.OPEN) {
             const payload = {
               targetReplyMessage: data.targetReplyMessage,
+              targetReplyUsername: data.targetReplyUsername,
               toUserId: uid,
               message: msgContent,
               roomCode: roomCode,
